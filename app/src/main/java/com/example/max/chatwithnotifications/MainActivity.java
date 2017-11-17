@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -28,22 +29,23 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser mFirebaseUser;
     private final String USERS_TABLE="USERS_TABLE";
     private DatabaseReference databaseReference;
-    private ArrayList<String> users;
+    private ArrayList<AppUser> users;
+    private AppUser user;
+    private ListView usersList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mFirebaseAuth=FirebaseAuth.getInstance();
         mFirebaseUser=mFirebaseAuth.getCurrentUser();
-        databaseReference= FirebaseDatabase.getInstance().getReference("users");
+        databaseReference= FirebaseDatabase.getInstance().getReference();
+        usersList= findViewById(R.id.users_list);
         users= new ArrayList<>();
-        users.add(mFirebaseUser.getUid());
-        /*ValueEventListener usersListener=new ValueEventListener() {
+        ValueEventListener usersListener=new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                      users.add(dataSnapshot.getValue(FirebaseUser.class));
+                      users.add(dataSnapshot.getValue(AppUser.class));
             }
 
             @Override
@@ -53,10 +55,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         databaseReference.addValueEventListener(usersListener);
-    */
-        if(!users.contains(mFirebaseUser.getUid())) {
-            databaseReference.child(USERS_TABLE).push().setValue(mFirebaseUser.getUid());
-        }
 
         if(mFirebaseUser==null)
         {
@@ -66,7 +64,16 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-            Toast.makeText(this,"Already signed",Toast.LENGTH_SHORT);
+
         }
+
+        user=new AppUser(mFirebaseUser.getDisplayName(),mFirebaseUser.getUid(),
+                mFirebaseUser.getPhotoUrl().toString());
+
+        if(!users.contains(user)) {
+            databaseReference.child(USERS_TABLE).push().setValue(user);
+            users.add(user);
+        }
+        usersList.setAdapter(new ArrayUsersAdapter(this,users));
     }
 }

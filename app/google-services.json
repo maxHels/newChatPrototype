@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "95955272146",
+    "firebase_url": "https://chatwithnotifications-477cc.firebaseio.com",
+    "project_id": "chatwithnotifications-477cc",
+    "storage_bucket": "chatwithnotifications-477cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95955272146:android:fe0d4c863ea794f3",
+        "android_client_info": {
+          "package_name": "com.example.max.chatwithnotifications"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95955272146-8id2jhgn3moa8qg7sabiodka22p7d3tj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.max.chatwithnotifications",
+            "certificate_hash": "c8c93f98f2e9b346fc33acb5010c61bdae082268"
+          }
+        },
+        {
+          "client_id": "95955272146-k162ac2aud2sa1bm8cdf6fjtm1ibthbq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv6Exsn5ScrWW6eXBO0ZCHq_ONs7PeJAM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95955272146-k162ac2aud2sa1bm8cdf6fjtm1ibthbq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

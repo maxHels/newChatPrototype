@@ -18,4 +18,13 @@ public class AppUser {
         this.PhotoUrl=PhotoUrl;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof AppUser)
+        {
+        AppUser user=(AppUser)obj;
+        return Uid.equals(user.Uid);
+        }
+        return false;
+    }
 }

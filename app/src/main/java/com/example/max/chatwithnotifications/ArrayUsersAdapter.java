@@ -54,9 +54,9 @@ public class ArrayUsersAdapter extends BaseAdapter {
 
         TextView textView = (TextView) temp.findViewById(R.id.user_name);
         textView.setText(user.Name);
-        ImageView imageView=(ImageView)temp.findViewById(R.id.user_photo);
-        Uri uri=Uri.parse(user.PhotoUrl);
-        imageView.setImageURI(uri);
+        //ImageView imageView=(ImageView)temp.findViewById(R.id.user_photo);
+        //Uri uri=Uri.parse(user.PhotoUrl);
+        //imageView.setImageURI(uri);
         return temp;
     }
 }

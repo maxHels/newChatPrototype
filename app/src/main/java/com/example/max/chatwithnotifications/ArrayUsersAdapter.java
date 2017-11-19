@@ -31,12 +31,12 @@ public class ArrayUsersAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return users.size();
+        return this.users.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return users.get(i);
+        return this.users.get(i);
     }
 
     @Override
@@ -54,9 +54,9 @@ public class ArrayUsersAdapter extends BaseAdapter {
 
         TextView textView = (TextView) temp.findViewById(R.id.user_name);
         textView.setText(user.Name);
-        //ImageView imageView=(ImageView)temp.findViewById(R.id.user_photo);
-        //Uri uri=Uri.parse(user.PhotoUrl);
-        //imageView.setImageURI(uri);
+        ImageView imageView=(ImageView)temp.findViewById(R.id.user_photo);
+        Uri uri=Uri.parse(user.PhotoUrl);
+        imageView.setImageURI(uri);
         return temp;
     }
 }

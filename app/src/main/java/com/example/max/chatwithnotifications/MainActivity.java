@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
                         AppUser user = postSnapshot.getValue(AppUser.class);
                         users.add(user);
                     }
-                    //users = (HashMap<Object, AppUser>)dataSnapshot.getChildren();
                     updateUI();
                 }
                 catch (Exception e)
@@ -88,19 +87,13 @@ public class MainActivity extends AppCompatActivity {
         user=new AppUser(mFirebaseUser.getDisplayName(),mFirebaseUser.getUid(),
                 mFirebaseUser.getPhotoUrl().toString());
 
-        /*if(users==null)
-            users=new HashMap<Object, AppUser>();
-        ArrayList<AppUser> otherUsers= new ArrayList<AppUser>();
-        otherUsers.addAll(users.values());
-        */
-        /*if(!otherUsers.contains(user))
+        if(!users.contains(user))
         {
             databaseReference.child(USERS_TABLE).push().setValue(user);
         }
-        else
-        {
-            //otherUsers.remove(user);
-        }*/
+        else {
+            users.remove(user);
+        }
 
         usersList.setAdapter(new ArrayUsersAdapter(this,users));
     }

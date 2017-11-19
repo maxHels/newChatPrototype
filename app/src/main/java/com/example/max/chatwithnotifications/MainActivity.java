@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private final String USERS_TABLE="USERS_TABLE";
     private DatabaseReference databaseReference;
     private  FirebaseDatabase database;
-    private HashMap<Object, AppUser> users;
+    private ArrayList<AppUser> users;
     private AppUser user;
     private ListView usersList;
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         mFirebaseAuth=FirebaseAuth.getInstance();
         mFirebaseUser=mFirebaseAuth.getCurrentUser();
-        databaseReference= FirebaseDatabase.getInstance().getReference();
+        databaseReference= FirebaseDatabase.getInstance().getReference(USERS_TABLE);
         usersList= findViewById(R.id.users_list);
 
         if(mFirebaseUser==null)
@@ -58,8 +58,13 @@ public class MainActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                users = new ArrayList<AppUser>();
                 try {
-                    users = (HashMap<Object, AppUser>)dataSnapshot.getValue();
+                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                        AppUser user = postSnapshot.getValue(AppUser.class);
+                        users.add(user);
+                    }
+                    //users = (HashMap<Object, AppUser>)dataSnapshot.getChildren();
                     updateUI();
                 }
                 catch (Exception e)
@@ -83,10 +88,11 @@ public class MainActivity extends AppCompatActivity {
         user=new AppUser(mFirebaseUser.getDisplayName(),mFirebaseUser.getUid(),
                 mFirebaseUser.getPhotoUrl().toString());
 
-        if(users==null)
-            users=new HashMap<>();
-        ArrayList<AppUser> otherUsers= new ArrayList<>(users.values());
-
+        /*if(users==null)
+            users=new HashMap<Object, AppUser>();
+        ArrayList<AppUser> otherUsers= new ArrayList<AppUser>();
+        otherUsers.addAll(users.values());
+        */
         /*if(!otherUsers.contains(user))
         {
             databaseReference.child(USERS_TABLE).push().setValue(user);
@@ -96,6 +102,6 @@ public class MainActivity extends AppCompatActivity {
             //otherUsers.remove(user);
         }*/
 
-        usersList.setAdapter(new ArrayUsersAdapter(this,otherUsers));
+        usersList.setAdapter(new ArrayUsersAdapter(this,users));
     }
 }

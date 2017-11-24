@@ -19,11 +19,15 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.max.chatwithnotifications.Fragments.FragmentAllUsers;
+import com.example.max.chatwithnotifications.Fragments.ListWithMessages;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import static com.example.max.chatwithnotifications.Fragments.FragmentAllUsers.*;
+
 public class SelectActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnFragmentInteractionListener,ListWithMessages.OnFragmentInteractionListener {
 
     private FirebaseUser user;
     private FirebaseAuth auth;
@@ -45,15 +49,6 @@ public class SelectActivity extends AppCompatActivity
         }
 
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -66,7 +61,22 @@ public class SelectActivity extends AppCompatActivity
         TextView userName=headLayout.findViewById(R.id.user_name);
         ImageView userPhoto=headLayout.findViewById(R.id.user_photo);
         userName.setText(user.getDisplayName());
-        userPhoto.setImageURI(user.getPhotoUrl());
+        new ImageDownloader(userPhoto).execute(user.getPhotoUrl().toString());
+
+        launchFragment(new FragmentAllUsers());
+    }
+
+    private void launchFragment(Fragment fragment)
+    {
+        FragmentTransaction fr=getFragmentManager().beginTransaction();
+        fr.replace(R.id.fragment_container,fragment);
+        fr.commit();
+    }
+
+    private void launchFragment(Fragment fragment, Bundle bundle)
+    {
+        fragment.setArguments(bundle);
+        launchFragment(fragment);
     }
 
     @Override
@@ -107,16 +117,25 @@ public class SelectActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        FragmentTransaction ftrans=getFragmentManager().beginTransaction();
         if(id==R.id.contacts)
         {
             FragmentAllUsers f=new FragmentAllUsers();
-            ftrans.replace(R.id.fragment_container,f);
+            launchFragment(f);
         }
-        ftrans.commit();
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction() {
+        Bundle chatName=new Bundle();
+        chatName.putString("chatName",user.getDisplayName());
+        launchFragment(new ListWithMessages(),chatName);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

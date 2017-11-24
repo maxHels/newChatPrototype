@@ -7,9 +7,9 @@ import android.net.Uri;
  */
 
 public class AppUser {
-    String Name;
-    String Uid;
-    String PhotoUrl;
+    public String Name;
+    public String Uid;
+    public String PhotoUrl;
     public AppUser(){}
     public AppUser(String Name, String Uid,String PhotoUrl)
     {
@@ -26,5 +26,10 @@ public class AppUser {
         return Uid.equals(user.Uid);
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return Name;
     }
 }

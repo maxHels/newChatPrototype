@@ -1,16 +1,23 @@
-package com.example.max.chatwithnotifications;
+package com.example.max.chatwithnotifications.Fragments;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.max.chatwithnotifications.AppUser;
+import com.example.max.chatwithnotifications.ArrayUsersAdapter;
+import com.example.max.chatwithnotifications.GoogleSignIn;
+import com.example.max.chatwithnotifications.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -84,7 +91,7 @@ public class FragmentAllUsers extends Fragment {
         database=FirebaseDatabase.getInstance();
         mFirebaseAuth=FirebaseAuth.getInstance();
         mFirebaseUser=mFirebaseAuth.getCurrentUser();
-        databaseReference= FirebaseDatabase.getInstance().getReference(USERS_TABLE);
+        databaseReference= database.getReference(USERS_TABLE);
 
 
         if(mFirebaseUser==null)
@@ -95,10 +102,12 @@ public class FragmentAllUsers extends Fragment {
             return;
         }
 
+        user=new AppUser(mFirebaseUser.getDisplayName(),mFirebaseUser.getUid(),mFirebaseUser.getUid());
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                users = new ArrayList<AppUser>();
+                users = new ArrayList<>();
                 try {
                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                         AppUser user = postSnapshot.getValue(AppUser.class);
@@ -119,6 +128,28 @@ public class FragmentAllUsers extends Fragment {
         });
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener)context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragment1DataListener");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
     private void updateUI()
     {
         user=new AppUser(mFirebaseUser.getDisplayName(),mFirebaseUser.getUid(),
@@ -126,13 +157,14 @@ public class FragmentAllUsers extends Fragment {
 
         if(!users.contains(user))
         {
-            databaseReference.child(USERS_TABLE).push().setValue(user);
+            FirebaseDatabase.getInstance().getReference().child(USERS_TABLE).push().setValue(user);
         }
         else {
             users.remove(user);
         }
 
         usersList.setAdapter(new ArrayUsersAdapter(this.getContext(),users));
+
     }
 
     @Override
@@ -141,27 +173,23 @@ public class FragmentAllUsers extends Fragment {
         // Inflate the layout for this fragment
         View v=inflater.inflate(R.layout.fragment_all_users, container, false);
         usersList=v.findViewById(R.id.users_listt);
-        //updateUI();
+
+        usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(mListener!=null)
+                    mListener.onFragmentInteraction();
+            }
+        });
         return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onFragmentInteraction();
         }
     }
-
-    /*@Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }*/
 
     @Override
     public void onDetach() {
@@ -181,6 +209,8 @@ public class FragmentAllUsers extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
+        void onFragmentInteraction();
+
         void onFragmentInteraction(Uri uri);
     }
 }

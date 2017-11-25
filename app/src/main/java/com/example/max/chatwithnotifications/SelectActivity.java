@@ -5,8 +5,6 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,17 +18,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.max.chatwithnotifications.Fragments.FragmentAllUsers;
-import com.example.max.chatwithnotifications.Fragments.ListWithMessages;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
 
 import static com.example.max.chatwithnotifications.Fragments.FragmentAllUsers.*;
 
 public class SelectActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnFragmentInteractionListener,ListWithMessages.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnFragmentInteractionListener {
 
     private FirebaseUser user;
     private FirebaseAuth auth;
+    private FragmentAllUsers fragmentAllUsers;
+    private AppUser appUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class SelectActivity extends AppCompatActivity
         setContentView(R.layout.activity_select);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        fragmentAllUsers=new FragmentAllUsers();
         auth=FirebaseAuth.getInstance();
         user=auth.getCurrentUser();
         if(user==null)
@@ -48,6 +49,7 @@ public class SelectActivity extends AppCompatActivity
             return;
         }
 
+        appUser=new AppUser(user.getDisplayName(),user.getUid(),user.getPhotoUrl().toString());
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -63,7 +65,7 @@ public class SelectActivity extends AppCompatActivity
         userName.setText(user.getDisplayName());
         new ImageDownloader(userPhoto).execute(user.getPhotoUrl().toString());
 
-        launchFragment(new FragmentAllUsers());
+        launchFragment(fragmentAllUsers);
     }
 
     private void launchFragment(Fragment fragment)
@@ -119,8 +121,7 @@ public class SelectActivity extends AppCompatActivity
 
         if(id==R.id.contacts)
         {
-            FragmentAllUsers f=new FragmentAllUsers();
-            launchFragment(f);
+            launchFragment(fragmentAllUsers);
         }
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -130,8 +131,13 @@ public class SelectActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction() {
         Bundle chatName=new Bundle();
-        chatName.putString("chatName",user.getDisplayName());
-        launchFragment(new ListWithMessages(),chatName);
+        chatName.putParcelable("chatName",fragmentAllUsers.tappedUser());
+        Intent intent=new Intent(this,Act.class);
+        ArrayList<AppUser> temp=new ArrayList<>(2);
+        temp.add(appUser);
+        temp.add(fragmentAllUsers.tappedUser());
+        intent.putExtra("users",temp);
+        startActivity(intent);
     }
 
     @Override

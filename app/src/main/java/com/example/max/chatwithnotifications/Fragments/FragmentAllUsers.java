@@ -55,6 +55,7 @@ public class FragmentAllUsers extends Fragment {
     private ArrayList<AppUser> users;
     private AppUser user;
     private ListView usersList;
+    private int clickedPosition;
 
     private OnFragmentInteractionListener mListener;
 
@@ -139,6 +140,11 @@ public class FragmentAllUsers extends Fragment {
         }
     }
 
+    public AppUser tappedUser()
+    {
+        return (AppUser) usersList.getItemAtPosition(clickedPosition);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -177,6 +183,7 @@ public class FragmentAllUsers extends Fragment {
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                clickedPosition=i;
                 if(mListener!=null)
                     mListener.onFragmentInteraction();
             }

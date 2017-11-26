@@ -18,6 +18,7 @@ import com.example.max.chatwithnotifications.AppUser;
 import com.example.max.chatwithnotifications.ArrayUsersAdapter;
 import com.example.max.chatwithnotifications.GoogleSignIn;
 import com.example.max.chatwithnotifications.R;
+import com.example.max.chatwithnotifications.UserLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,7 +48,6 @@ public class FragmentAllUsers extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private final String USERS_TABLE="USERS_TABLE";
     private DatabaseReference databaseReference;
@@ -90,18 +90,8 @@ public class FragmentAllUsers extends Fragment {
         }
 
         database=FirebaseDatabase.getInstance();
-        mFirebaseAuth=FirebaseAuth.getInstance();
-        mFirebaseUser=mFirebaseAuth.getCurrentUser();
+        mFirebaseUser= UserLoader.getCurrentFirebaseUser(getContext(),getActivity());
         databaseReference= database.getReference(USERS_TABLE);
-
-
-        if(mFirebaseUser==null)
-        {
-            startActivity(new Intent(this.getContext(),GoogleSignIn.class));
-            getActivity().finish();
-            database.setPersistenceEnabled(true);
-            return;
-        }
 
         user=new AppUser(mFirebaseUser.getDisplayName(),mFirebaseUser.getUid(),mFirebaseUser.getUid());
 
@@ -140,6 +130,7 @@ public class FragmentAllUsers extends Fragment {
         }
     }
 
+    //returns the AppUser from usersList which was last clicked
     public AppUser tappedUser()
     {
         return (AppUser) usersList.getItemAtPosition(clickedPosition);

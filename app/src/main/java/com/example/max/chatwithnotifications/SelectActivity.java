@@ -29,7 +29,6 @@ public class SelectActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnFragmentInteractionListener {
 
     private FirebaseUser user;
-    private FirebaseAuth auth;
     private FragmentAllUsers fragmentAllUsers;
     private AppUser appUser;
 
@@ -40,14 +39,7 @@ public class SelectActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fragmentAllUsers=new FragmentAllUsers();
-        auth=FirebaseAuth.getInstance();
-        user=auth.getCurrentUser();
-        if(user==null)
-        {
-            startActivity(new Intent(this,GoogleSignIn.class));
-            finish();
-            return;
-        }
+        user=UserLoader.getCurrentFirebaseUser(this,this);
 
         appUser=new AppUser(user.getDisplayName(),user.getUid(),user.getPhotoUrl().toString());
 
@@ -57,6 +49,7 @@ public class SelectActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        //Establishing view describing current user
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headLayout=navigationView.inflateHeaderView(R.layout.nav_header_select);
@@ -65,16 +58,19 @@ public class SelectActivity extends AppCompatActivity
         userName.setText(user.getDisplayName());
         new ImageDownloader(userPhoto).execute(user.getPhotoUrl().toString());
 
+        //Set default screen as contacts
         launchFragment(fragmentAllUsers);
     }
 
+    //Replace current fragment by other
+    //Example: replace contacts screen by chat screen
     private void launchFragment(Fragment fragment)
     {
         FragmentTransaction fr=getFragmentManager().beginTransaction();
         fr.replace(R.id.fragment_container,fragment);
         fr.commit();
     }
-
+    //Same action as previous, but can transfer some data
     private void launchFragment(Fragment fragment, Bundle bundle)
     {
         fragment.setArguments(bundle);

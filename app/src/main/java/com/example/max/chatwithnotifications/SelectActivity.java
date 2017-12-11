@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.max.chatwithnotifications.Fragments.ChatListFragment;
 import com.example.max.chatwithnotifications.Fragments.FragmentAllUsers;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +27,8 @@ import java.util.ArrayList;
 import static com.example.max.chatwithnotifications.Fragments.FragmentAllUsers.*;
 
 public class SelectActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnFragmentInteractionListener,
+        ChatListFragment.OnFragmentInteractionListener {
 
     private FirebaseUser user;
     private FragmentAllUsers fragmentAllUsers;
@@ -118,6 +120,10 @@ public class SelectActivity extends AppCompatActivity
         if(id==R.id.contacts)
         {
             launchFragment(fragmentAllUsers);
+        }
+        if(id==R.id.all_chats_act)
+        {
+            launchFragment(new ChatListFragment());
         }
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

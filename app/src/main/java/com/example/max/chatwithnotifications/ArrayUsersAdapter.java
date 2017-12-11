@@ -52,9 +52,9 @@ public class ArrayUsersAdapter extends BaseAdapter {
 
         AppUser user=(AppUser) getItem(i);
 
-        TextView textView = (TextView) temp.findViewById(R.id.user_name);
+        TextView textView = temp.findViewById(R.id.user_name);
         textView.setText(user.Name);
-        ImageView imageView=(ImageView)temp.findViewById(R.id.user_photo);
+        ImageView imageView= temp.findViewById(R.id.user_photo);
         new ImageDownloader(imageView).execute(user.PhotoUrl);
         return temp;
     }

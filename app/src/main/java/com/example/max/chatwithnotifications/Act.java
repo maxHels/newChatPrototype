@@ -4,17 +4,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,40 +29,23 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.appinvite.AppInvite;
-import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-import com.google.firebase.appindexing.Action;
-import com.google.firebase.appindexing.FirebaseAppIndex;
-import com.google.firebase.appindexing.FirebaseUserActions;
-import com.google.firebase.appindexing.Indexable;
-import com.google.firebase.appindexing.builders.Indexables;
-import com.google.firebase.appindexing.builders.PersonBuilder;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -90,8 +68,8 @@ public class Act extends AppCompatActivity
     }
 
     private static final String TAG = "MainActivity";
+    private static final String CHAT_REFERENCE="CHATS";
     private String MESSAGES_CHILD;
-    private static final int REQUEST_INVITE = 1;
     private static final int REQUEST_IMAGE = 2;
     private static final String LOADING_IMAGE_URL = "https://www.google.com/images/spin-32.gif";
 
@@ -137,7 +115,13 @@ public class Act extends AppCompatActivity
 
         MESSAGES_CHILD = MessagesUrl(user.Uid, otherUser.Uid);
 
-        mFirebaseUser = UserLoader.getCurrentFirebaseUser(this,this);
+            Chat chat = new Chat(otherUser.toString(), MESSAGES_CHILD, null, otherUser.PhotoUrl);
+            Chat ch = new Chat(user.toString(), MESSAGES_CHILD, null, user.PhotoUrl);
+
+            FirebaseDatabase.getInstance().getReference("USER_CHAT_INFO").child(user.Uid).
+                    child(MESSAGES_CHILD).setValue(chat);
+            FirebaseDatabase.getInstance().getReference("USER_CHAT_INFO").child(otherUser.Uid)
+                    .child(MESSAGES_CHILD).setValue(ch);
 
            /* mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .enableAutoManage(this , this )
@@ -145,13 +129,13 @@ public class Act extends AppCompatActivity
                     .build();*/
 
             // Initialize ProgressBar and RecyclerView.
-            mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-            mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
+            mProgressBar = findViewById(R.id.progressBar);
+            mMessageRecyclerView = findViewById(R.id.messageRecyclerView);
             mLinearLayoutManager = new LinearLayoutManager(this);
             mLinearLayoutManager.setStackFromEnd(true);
             mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-            mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+            mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference(CHAT_REFERENCE);
             SnapshotParser<ChatMessage> parser = new SnapshotParser<ChatMessage>() {
                 @Override
                 public ChatMessage parseSnapshot(DataSnapshot dataSnapshot) {
@@ -247,7 +231,7 @@ public class Act extends AppCompatActivity
 
             mMessageRecyclerView.setAdapter(mFirebaseAdapter);
 
-            mMessageEditText = (EditText) findViewById(R.id.messageEditText);
+            mMessageEditText = findViewById(R.id.messageEditText);
             mMessageEditText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -267,7 +251,7 @@ public class Act extends AppCompatActivity
                 }
             });
 
-            mSendButton = (Button) findViewById(R.id.sendButton);
+            mSendButton = findViewById(R.id.sendButton);
             mSendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -277,11 +261,17 @@ public class Act extends AppCompatActivity
                             user.PhotoUrl,
                             null /* no image */);
                     mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                    FirebaseDatabase.getInstance().getReference("USER_CHAT_INFO").child(user.Uid)
+                    .child(MESSAGES_CHILD+"/LastMessage")
+                            .setValue(mMessageEditText.getText().toString());
+                    FirebaseDatabase.getInstance().getReference("USER_CHAT_INFO").child(otherUser.Uid)
+                            .child(MESSAGES_CHILD+"/LastMessage")
+                            .setValue(mMessageEditText.getText().toString());
                     mMessageEditText.setText("");
                 }
             });
 
-            mAddMessageImageView = (ImageView) findViewById(R.id.addMessageImageView);
+            mAddMessageImageView = findViewById(R.id.addMessageImageView);
             mAddMessageImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

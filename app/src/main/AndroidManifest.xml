@@ -12,6 +12,7 @@
         <activity android:name=".GoogleSignIn" />
         <activity
             android:name=".SelectActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_select"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

@@ -120,31 +120,6 @@ public class Act extends AppCompatActivity
 
         firebaseChatInfoReference=FirebaseDatabase.getInstance().getReference(CHAT_INFO_REFERENCE);
 
-            /*firebaseChatInfoReference.addValueEventListener(new ValueEventListener() {
-                Chat chat;
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    try {
-                        chat = dataSnapshot.getValue(Chat.class);
-                    }
-                    catch (Exception e)
-                    {
-                        Chat cha = new Chat(otherUser.toString(), MESSAGES_CHILD, null, otherUser.PhotoUrl);
-                        Chat ch = new Chat(user.toString(), MESSAGES_CHILD, null, user.PhotoUrl);
-
-                        FirebaseDatabase.getInstance().getReference(CHAT_INFO_REFERENCE).child(user.Uid).
-                                child(MESSAGES_CHILD).setValue(cha);
-                        FirebaseDatabase.getInstance().getReference(CHAT_INFO_REFERENCE).child(otherUser.Uid)
-                                .child(MESSAGES_CHILD).setValue(ch);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });*/
-
            /* mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .enableAutoManage(this , this )
                     .addApi(Auth.GOOGLE_SIGN_IN_API)
@@ -283,14 +258,17 @@ public class Act extends AppCompatActivity
                             user.PhotoUrl,
                             null /* no image */);
                     mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                    ArrayList<AppUser> part=new ArrayList<AppUser>();
+                    part.add(user);
+                    part.add(otherUser);
                     firebaseChatInfoReference.child(user.Uid)
                     .child(MESSAGES_CHILD)
                             .setValue(new Chat(otherUser.toString(),MESSAGES_CHILD,
-                                    mMessageEditText.getText().toString(),otherUser.PhotoUrl));
+                                    mMessageEditText.getText().toString(),otherUser.PhotoUrl,part));
                     firebaseChatInfoReference.child(otherUser.Uid)
                             .child(MESSAGES_CHILD)
                             .setValue(new Chat(user.toString(),MESSAGES_CHILD,
-                                    mMessageEditText.getText().toString(),user.PhotoUrl));
+                                    mMessageEditText.getText().toString(),user.PhotoUrl,part));
                     mMessageEditText.setText("");
                 }
             });

@@ -132,15 +132,8 @@ public class SelectActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction() {
-        Bundle chatName=new Bundle();
-        chatName.putParcelable("chatName",fragmentAllUsers.tappedUser());
-        Intent intent=new Intent(this,Act.class);
-        ArrayList<AppUser> temp=new ArrayList<>(2);
-        temp.add(appUser);
-        temp.add(fragmentAllUsers.tappedUser());
-        intent.putExtra("users",temp);
-        startActivity(intent);
     }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {

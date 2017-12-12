@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.max.chatwithnotifications.Act;
 import com.example.max.chatwithnotifications.AppUser;
 import com.example.max.chatwithnotifications.ArrayUsersAdapter;
 import com.example.max.chatwithnotifications.GoogleSignIn;
@@ -131,9 +132,19 @@ public class FragmentAllUsers extends Fragment {
     }
 
     //returns the AppUser from usersList which was last clicked
-    public AppUser tappedUser()
+    private AppUser tappedUser()
     {
         return (AppUser) usersList.getItemAtPosition(clickedPosition);
+    }
+
+    private void startAct(Class actClass)
+    {
+        Intent intent=new Intent(getContext(),actClass);
+        ArrayList<AppUser> temp=new ArrayList<>(2);
+        temp.add(user);
+        temp.add(tappedUser());
+        intent.putExtra("users",temp);
+        getContext().startActivity(intent);
     }
 
     @Override
@@ -175,8 +186,7 @@ public class FragmentAllUsers extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 clickedPosition=i;
-                if(mListener!=null)
-                    mListener.onFragmentInteraction();
+                startAct(Act.class);
             }
         });
         return v;

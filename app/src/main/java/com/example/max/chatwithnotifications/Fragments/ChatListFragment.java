@@ -1,14 +1,17 @@
 package com.example.max.chatwithnotifications.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.max.chatwithnotifications.Act;
 import com.example.max.chatwithnotifications.AppUser;
 import com.example.max.chatwithnotifications.Chat;
 import com.example.max.chatwithnotifications.ChatAdapter;
@@ -113,8 +116,31 @@ public class ChatListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v=inflater.inflate(R.layout.fragment_chat_list,container,false);
         chatList=v.findViewById(R.id.chat_list);
+        chatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                startAct(Act.class,chatParticipants(getClickedChat(i)));
+            }
+        });
         // Inflate the layout for this fragment
         return v;
+    }
+
+    private Chat getClickedChat(int pos)
+    {
+        return (Chat)chatList.getItemAtPosition(pos);
+    }
+
+    private ArrayList<AppUser> chatParticipants(Chat chat)
+    {
+        return chat.ChatParticipants;
+    }
+
+    private void startAct(Class actClass,ArrayList<AppUser> users)
+    {
+        Intent intent=new Intent(getContext(),actClass);
+        intent.putExtra("users",users);
+        getContext().startActivity(intent);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

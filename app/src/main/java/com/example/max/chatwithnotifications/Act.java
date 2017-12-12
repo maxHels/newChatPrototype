@@ -1,5 +1,8 @@
 package com.example.max.chatwithnotifications;
 
+import android.content.RestrictionEntry;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -33,6 +36,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +50,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -90,33 +95,37 @@ public class Act extends AppCompatActivity
             mFirebaseAdapter;
 
     //AppUsers
-    private AppUser user, otherUser;
+    private AppUser user;
+    private ArrayList<AppUser> chatParticipants;
 
-    @NonNull
-    private String MessagesUrl(String Uid1, String Uid2)
+    private Chat chat;
+
+    private String MessagesUrl(ArrayList<AppUser> users)
     {
-        if(Uid1.compareTo(Uid2)>0)
-        {
-            return Uid1+Uid2;
+        Collections.sort(users);
+        String res="";
+        for (AppUser s:
+             users) {
+            res+=s.Uid;
         }
-        else {
-            return Uid2+Uid1;
-        }
+        return res;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_);
         Intent intent = getIntent();
-        final ArrayList<AppUser> u = intent.getParcelableArrayListExtra("users");
-        user = u.get(0);
-        otherUser = u.get(1);
+        chat=intent.getParcelableExtra("chat");
+        this.setTitle(chat.toString());
+        chatParticipants=chat.ChatParticipants;
+        MESSAGES_CHILD=MessagesUrl(chatParticipants);
+        chat.Reference=MESSAGES_CHILD;
+        FirebaseUser us= FirebaseAuth.getInstance().getCurrentUser();
+        user = chatParticipants.get(chatParticipants.lastIndexOf(new AppUser(us)));
+        chatParticipants.remove(user);
 
-        this.setTitle(otherUser.toString());
 
-        MESSAGES_CHILD = MessagesUrl(user.Uid, otherUser.Uid);
 
         firebaseChatInfoReference=FirebaseDatabase.getInstance().getReference(CHAT_INFO_REFERENCE);
 
@@ -260,15 +269,13 @@ public class Act extends AppCompatActivity
                     mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                     ArrayList<AppUser> part=new ArrayList<AppUser>();
                     part.add(user);
-                    part.add(otherUser);
+                    part.addAll(chatParticipants);
                     firebaseChatInfoReference.child(user.Uid)
                     .child(MESSAGES_CHILD)
-                            .setValue(new Chat(otherUser.toString(),MESSAGES_CHILD,
-                                    mMessageEditText.getText().toString(),otherUser.PhotoUrl,part));
-                    firebaseChatInfoReference.child(otherUser.Uid)
-                            .child(MESSAGES_CHILD)
-                            .setValue(new Chat(user.toString(),MESSAGES_CHILD,
-                                    mMessageEditText.getText().toString(),user.PhotoUrl,part));
+                            .setValue(new Chat(chat.toString(),MESSAGES_CHILD,
+                                    mMessageEditText.getText().toString(),chat.PhotoUrl,part));
+                    updateUsersChatInfo(new Chat(user.toString(),MESSAGES_CHILD,mMessageEditText.getText().toString()
+                    ,user.PhotoUrl,part));
                     mMessageEditText.setText("");
                 }
             });
@@ -284,6 +291,14 @@ public class Act extends AppCompatActivity
                     startActivityForResult(intent, REQUEST_IMAGE);
                 }
             });
+    }
+
+    private void updateUsersChatInfo(Chat chat)
+    {
+        for (AppUser u:
+             chatParticipants) {
+            firebaseChatInfoReference.child(u.Uid).child(MESSAGES_CHILD).setValue(chat);
+        }
     }
 
     @Override

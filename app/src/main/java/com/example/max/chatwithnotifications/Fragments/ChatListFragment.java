@@ -119,7 +119,7 @@ public class ChatListFragment extends Fragment {
         chatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                startAct(Act.class,chatParticipants(getClickedChat(i)));
+                startAct(Act.class,getClickedChat(i));
             }
         });
         // Inflate the layout for this fragment
@@ -136,10 +136,10 @@ public class ChatListFragment extends Fragment {
         return chat.ChatParticipants;
     }
 
-    private void startAct(Class actClass,ArrayList<AppUser> users)
+    private void startAct(Class actClass,Chat chat)
     {
         Intent intent=new Intent(getContext(),actClass);
-        intent.putExtra("users",users);
+        intent.putExtra("chat",chat);
         getContext().startActivity(intent);
     }
 

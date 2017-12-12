@@ -17,6 +17,7 @@ import android.widget.ListView;
 import com.example.max.chatwithnotifications.Act;
 import com.example.max.chatwithnotifications.AppUser;
 import com.example.max.chatwithnotifications.ArrayUsersAdapter;
+import com.example.max.chatwithnotifications.Chat;
 import com.example.max.chatwithnotifications.GoogleSignIn;
 import com.example.max.chatwithnotifications.R;
 import com.example.max.chatwithnotifications.UserLoader;
@@ -143,7 +144,8 @@ public class FragmentAllUsers extends Fragment {
         ArrayList<AppUser> temp=new ArrayList<>(2);
         temp.add(user);
         temp.add(tappedUser());
-        intent.putExtra("users",temp);
+        Chat transChat=new Chat(tappedUser().toString(),null,null,tappedUser().PhotoUrl,temp);
+        intent.putExtra("chat",transChat);
         getContext().startActivity(intent);
     }
 

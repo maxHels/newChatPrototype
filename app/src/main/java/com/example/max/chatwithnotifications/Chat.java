@@ -1,12 +1,15 @@
 package com.example.max.chatwithnotifications;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
 /**
  * Created by Max on 01.12.2017.
  */
 
-public class Chat {
+public class Chat implements Parcelable {
     public Chat(String title, String reference, String lastMessage, String photoUrl,
                 ArrayList<AppUser>chatParticipants) {
         Title = title;
@@ -23,4 +26,43 @@ public class Chat {
     public String LastMessage;
     public String PhotoUrl;
     public ArrayList<AppUser> ChatParticipants;
+
+    protected Chat(Parcel in) {
+        Title = in.readString();
+        Reference = in.readString();
+        LastMessage = in.readString();
+        PhotoUrl = in.readString();
+        ChatParticipants = in.readArrayList(getClass().getClassLoader());
+    }
+
+    public static Creator<Chat> CREATOR = new Creator<Chat>() {
+        @Override
+        public Chat createFromParcel(Parcel in) {
+            return new Chat(in);
+        }
+
+        @Override
+        public Chat[] newArray(int size) {
+            return new Chat[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(Title);
+        parcel.writeString(Reference);
+        parcel.writeString(LastMessage);
+        parcel.writeString(PhotoUrl);
+        parcel.writeList(ChatParticipants);
+    }
+
+    @Override
+    public String toString() {
+        return Title;
+    }
 }

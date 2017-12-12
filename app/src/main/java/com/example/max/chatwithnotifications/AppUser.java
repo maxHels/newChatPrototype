@@ -3,12 +3,16 @@ package com.example.max.chatwithnotifications;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.Contacts;
+import android.support.annotation.NonNull;
+
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Created by Max on 17.11.2017.
  */
 
-public class AppUser implements Parcelable {
+public class AppUser implements Parcelable, Comparable<AppUser> {
     public String Name;
     public String Uid;
     public String PhotoUrl;
@@ -18,6 +22,12 @@ public class AppUser implements Parcelable {
         this.Name=Name;
         this.Uid=Uid;
         this.PhotoUrl=PhotoUrl;
+    }
+    public AppUser(FirebaseUser user)
+    {
+        Name=user.getDisplayName();
+        Uid=user.getUid();
+        PhotoUrl=user.getPhotoUrl().toString();
     }
 
     protected AppUser(Parcel in) {
@@ -48,6 +58,8 @@ public class AppUser implements Parcelable {
         return false;
     }
 
+
+
     @Override
     public String toString() {
         return Name;
@@ -63,5 +75,10 @@ public class AppUser implements Parcelable {
         parcel.writeString(Name);
         parcel.writeString(Uid);
         parcel.writeString(PhotoUrl);
+    }
+
+    @Override
+    public int compareTo(@NonNull AppUser appUser) {
+        return this.Uid.compareTo(appUser.Uid);
     }
 }

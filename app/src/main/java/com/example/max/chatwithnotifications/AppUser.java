@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class AppUser implements Parcelable, Comparable<AppUser> {
     public String Name;
+    //variable used only for checkBox
+    public boolean box=false;
     public String Uid;
     public String PhotoUrl;
     public AppUser(){}

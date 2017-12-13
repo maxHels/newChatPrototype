@@ -10,6 +10,9 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.ArrayList;
 
 /**
  * Created by Max on 26.11.2017.
@@ -40,5 +43,15 @@ public class UserLoader {
         FirebaseAuth auth=FirebaseAuth.getInstance();
         auth.signOut();
         getCurrentFirebaseUser(context,activity);
+    }
+
+    public static ArrayList<AppUser> getAllAppUsers(DataSnapshot snapshot)
+    {
+        ArrayList<AppUser> users= new ArrayList<>();
+        for (DataSnapshot userSnapshot:
+             snapshot.getChildren()) {
+            users.add(userSnapshot.getValue(AppUser.class));
+        }
+        return users;
     }
 }

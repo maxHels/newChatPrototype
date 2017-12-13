@@ -100,17 +100,6 @@ public class Act extends AppCompatActivity
 
     private Chat chat;
 
-    private String MessagesUrl(ArrayList<AppUser> users)
-    {
-        Collections.sort(users);
-        String res="";
-        for (AppUser s:
-             users) {
-            res+=s.Uid;
-        }
-        return res;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,12 +108,11 @@ public class Act extends AppCompatActivity
         chat=intent.getParcelableExtra("chat");
         this.setTitle(chat.toString());
         chatParticipants=chat.ChatParticipants;
-        MESSAGES_CHILD=MessagesUrl(chatParticipants);
+        MESSAGES_CHILD=ChatCreator.makeChatRef(chatParticipants);
         chat.Reference=MESSAGES_CHILD;
-        FirebaseUser us= FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser us= FirebaseAuth.getInstance().getCurrentUser();
         user = chatParticipants.get(chatParticipants.lastIndexOf(new AppUser(us)));
         chatParticipants.remove(user);
-
 
 
         firebaseChatInfoReference=FirebaseDatabase.getInstance().getReference(CHAT_INFO_REFERENCE);
@@ -274,8 +262,15 @@ public class Act extends AppCompatActivity
                     .child(MESSAGES_CHILD)
                             .setValue(new Chat(chat.toString(),MESSAGES_CHILD,
                                     mMessageEditText.getText().toString(),chat.PhotoUrl,part));
-                    updateUsersChatInfo(new Chat(user.toString(),MESSAGES_CHILD,mMessageEditText.getText().toString()
-                    ,user.PhotoUrl,part));
+                    if(chatParticipants.size()!=1) {
+                        chat.ChatParticipants=part;
+                        chat.LastMessage = mMessageEditText.getText().toString();
+                        updateUsersChatInfo(chat);
+                    }
+                    else{
+                        updateUsersChatInfo(new Chat(user.toString(),MESSAGES_CHILD,
+                                mMessageEditText.getText().toString(),user.PhotoUrl,part));
+                    }
                     mMessageEditText.setText("");
                 }
             });

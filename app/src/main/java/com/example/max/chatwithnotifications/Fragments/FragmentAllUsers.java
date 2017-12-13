@@ -102,10 +102,7 @@ public class FragmentAllUsers extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 users = new ArrayList<>();
                 try {
-                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                        AppUser user = postSnapshot.getValue(AppUser.class);
-                        users.add(user);
-                    }
+                    users=UserLoader.getAllAppUsers(dataSnapshot);
                     updateUI();
                 }
                 catch (Exception e)

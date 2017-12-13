@@ -60,3 +60,4 @@ public class ChatAdapter extends BaseAdapter {
         return temp;
     }
 }
+

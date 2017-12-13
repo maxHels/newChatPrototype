@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.max.chatwithnotifications.Fragments.ChatListFragment;
 import com.example.max.chatwithnotifications.Fragments.FragmentAllUsers;
+import com.example.max.chatwithnotifications.Fragments.MultipleChatCreatorFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -124,6 +125,9 @@ public class SelectActivity extends AppCompatActivity
         if(id==R.id.all_chats_act)
         {
             launchFragment(new ChatListFragment());
+        }
+        if(id==R.id.new_chat_act) {
+            launchFragment(new MultipleChatCreatorFragment());
         }
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
